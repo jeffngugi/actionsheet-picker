@@ -1,12 +1,11 @@
 import { Text, View, StyleSheet } from 'react-native';
-import { multiply } from 'actionsheet-picker';
 
-const result = multiply(3, 7);
-
+// Demo screens (basic, searchable, remote search, infinite, hierarchy,
+// multiple, react-hook-form, themed, inside a modal, RTL) land in phase 3.
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Text>actionsheet-picker example</Text>
     </View>
   );
 }
