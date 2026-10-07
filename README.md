@@ -82,7 +82,7 @@ import { RHFActionSheetPicker } from 'actionsheet-picker/react-hook-form';
 ## Roadmap
 
 - [x] Phase 0: scaffold, tooling, CI
-- [ ] Phase 1: pure core (schema, rows, hierarchy, search, selection, cache, pagination merge)
+- [x] Phase 1: pure core (schema, rows, hierarchy, search, selection, cache, pagination merge)
 - [ ] Phase 2: `useActionSheetPicker` headless hook
 - [ ] Phase 3: default UI (RN Modal sheet, FlatList, themes) + example screens
 - [ ] Phase 4: `react-hook-form` adapter

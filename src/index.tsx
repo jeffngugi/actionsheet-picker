@@ -1,2 +1,2 @@
-// Public API is built out in phases 1–4; see README for the roadmap.
-export {};
+// Phase 1 exposes the pure core; the hook and components land in later phases.
+export * from './core';
