@@ -13,7 +13,13 @@ import {
 } from '../core/selection';
 import type { KeyValueItem, Row, ValueType } from '../core/types';
 import { useLatest, useShallowStable, useShallowStableArray } from './stable';
-import type { PickerOptions, PickerState, SearchConfig } from './types';
+import type {
+  MultiPickerOptions,
+  PickerOptions,
+  PickerState,
+  SearchConfig,
+  SinglePickerOptions,
+} from './types';
 
 const DEFAULT_DEBOUNCE_MS = 300;
 
@@ -38,6 +44,21 @@ function sameKeys(a: ReadonlySet<string>, b: ReadonlySet<string>) {
  * single/multi selection, the selected-item cache and pagination. Renders
  * nothing — the default UI and custom UIs are built on top of it.
  */
+// Separate signatures so TypeScript infers `V` from `value` in each mode
+// (inference through the single|multi union falls back to `ValueType`).
+export function useActionSheetPicker<
+  T = KeyValueItem,
+  V extends ValueType = ValueType,
+>(options: SinglePickerOptions<T, V>): PickerState<T>;
+export function useActionSheetPicker<
+  T = KeyValueItem,
+  V extends ValueType = ValueType,
+>(options: MultiPickerOptions<T, V>): PickerState<T>;
+/** For wrappers that forward already-typed props of either mode. */
+export function useActionSheetPicker<
+  T = KeyValueItem,
+  V extends ValueType = ValueType,
+>(options: PickerOptions<T, V>): PickerState<T>;
 export function useActionSheetPicker<
   T = KeyValueItem,
   V extends ValueType = ValueType,
@@ -353,6 +374,7 @@ export function useActionSheetPicker<
     removeValue,
     clear,
     commit,
+    requiresCommit: usesDraft,
     isDirty: usesDraft && isOpen && !sameKeys(draftKeys, committedKeys),
     draftCount: usesDraft && isOpen ? draftKeys.size : committedKeys.size,
     onEndReached,

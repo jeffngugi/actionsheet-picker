@@ -46,7 +46,7 @@ const [country, setCountry] = useState<string | null>(null);
 ```tsx
 <ActionSheetPicker
   items={categories}
-  hierarchy={{ type: 'nested', childrenKey: 'subCategories' }}
+  hierarchy={{ type: 'nested', childrenKey: 'options' }}
   value={categoryId}
   onChange={setCategoryId}
 />
@@ -83,8 +83,8 @@ import { RHFActionSheetPicker } from 'actionsheet-picker/react-hook-form';
 
 - [x] Phase 0: scaffold, tooling, CI
 - [x] Phase 1: pure core (schema, rows, hierarchy, search, selection, cache, pagination merge)
-- [ ] Phase 2: `useActionSheetPicker` headless hook
-- [ ] Phase 3: default UI (RN Modal sheet, FlatList, themes) + example screens
+- [x] Phase 2: `useActionSheetPicker` headless hook
+- [x] Phase 3: default UI (RN Modal sheet, FlatList, themes) + example screens
 - [ ] Phase 4: `react-hook-form` adapter
 - [ ] Phase 5: docs and `0.1.0` release
 

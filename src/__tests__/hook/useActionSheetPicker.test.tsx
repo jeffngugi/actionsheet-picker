@@ -333,7 +333,7 @@ describe('local search', () => {
       {
         label: 'Travel',
         value: 10,
-        subCategoryOptions: [
+        options: [
           { label: 'Taxi', value: 11 },
           { label: 'Flights', value: 12 },
         ],
@@ -344,7 +344,7 @@ describe('local search', () => {
       useSingle({
         items,
         searchable: true,
-        hierarchy: { type: 'nested', childrenKey: 'subCategoryOptions' },
+        hierarchy: { type: 'nested', childrenKey: 'options' },
       })
     );
     await act(() => result.current.picker.setQuery('fli'));

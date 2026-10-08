@@ -132,6 +132,8 @@ export interface PickerState<T> {
   clear: () => void;
   /** Multi `done` mode: apply the draft and close. */
   commit: () => void;
+  /** True in multi `done` mode, where picks need `commit()` to apply. */
+  requiresCommit: boolean;
   /** Multi `done` mode: whether the draft differs from the value. */
   isDirty: boolean;
   draftCount: number;

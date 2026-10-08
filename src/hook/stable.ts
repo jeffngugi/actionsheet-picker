@@ -43,6 +43,22 @@ export function useShallowStable<T extends object | undefined>(value: T): T {
 }
 
 /**
+ * Keeps the previous reference while the value serialises identically — for
+ * small plain-data objects such as theme tokens nested two levels deep.
+ */
+export function useJsonStable<T>(value: T): T {
+  const ref = useRef(value);
+  const keyRef = useRef<string | null>(null);
+  const key = JSON.stringify(value) ?? '';
+  if (keyRef.current === null) keyRef.current = key;
+  else if (keyRef.current !== key) {
+    keyRef.current = key;
+    ref.current = value;
+  }
+  return ref.current;
+}
+
+/**
  * Same for arrays compared element-by-element (by identity), so
  * `items={pages.flat()}` only rebuilds rows when an item actually changes.
  */

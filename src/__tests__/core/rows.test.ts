@@ -70,22 +70,22 @@ describe('buildRows — key–value (default)', () => {
 });
 
 describe('buildRows — nested hierarchy', () => {
-  // Shape used by expense categories: parents carry `subCategoryOptions`.
+  // Parents carry their children under a custom key (`options`).
   const categories = [
     {
       label: 'Travel',
       value: 10,
-      subCategoryOptions: [
+      options: [
         { label: 'Taxi', value: 11, parent: 10 },
         { label: 'Flights', value: 12, parent: 10 },
       ],
     },
     { label: 'Meals', value: 20 },
-    { label: 'Office', value: 30, subCategoryOptions: [] },
+    { label: 'Office', value: 30, options: [] },
   ];
   const hierarchy = {
     type: 'nested',
-    childrenKey: 'subCategoryOptions',
+    childrenKey: 'options',
   } as const;
 
   it('places children right after their parent; parents unselectable by default', () => {
