@@ -122,6 +122,11 @@ export interface PickerState<T> {
   isSelected: (valueKey: string) => boolean;
   /** Committed selection, resolved through the cache (for the trigger). */
   selectedRows: Row<T>[];
+  /**
+   * Any row the picker has seen, by `valueKey` — e.g. a selected child's
+   * parent, even after it scrolled out of a paginated list.
+   */
+  resolveRow: (valueKey: string) => Row<T> | undefined;
   hasValue: boolean;
 
   /** Tap handler for a row. Ignores unselectable rows. */

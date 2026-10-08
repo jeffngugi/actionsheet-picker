@@ -220,6 +220,11 @@ export function useActionSheetPicker<
     [resolve, committedKeys]
   );
 
+  const resolveRow = useCallback(
+    (valueKey: string) => resolve([valueKey])[0],
+    [resolve]
+  );
+
   const resolveItems = useCallback(
     (values: readonly ValueType[]) =>
       resolve(values.map(keyOf)).map((r) => r.item),
@@ -369,6 +374,7 @@ export function useActionSheetPicker<
     selectedKeys,
     isSelected,
     selectedRows,
+    resolveRow,
     hasValue: committedKeys.size > 0,
     selectRow,
     removeValue,

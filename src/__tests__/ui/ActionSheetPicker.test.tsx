@@ -190,6 +190,126 @@ describe('hierarchy', () => {
   });
 });
 
+describe('grouped options search (opt-in)', () => {
+  const groups = [
+    {
+      label: 'Fruits',
+      value: 10,
+      options: [
+        { label: 'Apple', value: 11 },
+        { label: 'Mango', value: 12 },
+      ],
+    },
+    { label: 'Water', value: 20 },
+  ];
+  const hierarchy = { type: 'nested', childrenKey: 'options' } as const;
+
+  it('has no search box unless searchable is set', async () => {
+    await render(<Single items={groups} hierarchy={hierarchy} />);
+    await open('country');
+    expect(screen.queryByTestId('country-search')).toBeNull();
+    expect(screen.getByText('Mango')).toBeTruthy();
+  });
+
+  it('searches inside groups when searchable is set', async () => {
+    await render(<Single items={groups} hierarchy={hierarchy} searchable />);
+    await open('country');
+    await fireEvent.changeText(screen.getByTestId('country-search'), 'man');
+    expect(screen.getByText('Fruits')).toBeTruthy(); // parent kept
+    expect(screen.getByText('Mango')).toBeTruthy();
+    expect(screen.queryByText('Apple')).toBeNull();
+    expect(screen.queryByText('Water')).toBeNull();
+  });
+});
+
+describe('grouped options label', () => {
+  const groups = [
+    {
+      label: 'Fruits',
+      value: 10,
+      options: [
+        { label: 'Apple', value: 11 },
+        { label: 'Banana', value: 12 },
+      ],
+    },
+    { label: 'Water', value: 20 },
+  ];
+  const hierarchy = { type: 'nested', childrenKey: 'options' } as const;
+
+  it('shows just the option label by default', async () => {
+    await render(<Single items={groups} hierarchy={hierarchy} />);
+    await open('country');
+    await fireEvent.press(screen.getByText('Banana'));
+    expect(
+      screen.getByTestId('country').props.accessibilityValue
+    ).toMatchObject({ text: 'Banana' });
+  });
+
+  it('prefixes the group with showParentLabel', async () => {
+    await render(
+      <Single items={groups} hierarchy={hierarchy} showParentLabel />
+    );
+    await open('country');
+    await fireEvent.press(screen.getByText('Banana'));
+    expect(screen.getByText('Fruits › Banana')).toBeTruthy();
+  });
+
+  it('supports a custom separator and leaves top-level options alone', async () => {
+    await render(
+      <Single
+        items={groups}
+        hierarchy={hierarchy}
+        showParentLabel
+        parentLabelSeparator=" / "
+      />
+    );
+    await open('country');
+    await fireEvent.press(screen.getByText('Apple'));
+    expect(screen.getByText('Fruits / Apple')).toBeTruthy();
+    await open('country');
+    await fireEvent.press(screen.getByText('Water'));
+    expect(
+      screen.getByTestId('country').props.accessibilityValue
+    ).toMatchObject({ text: 'Water' });
+  });
+
+  it('applies to each label in multi-select', async () => {
+    await render(
+      <Multi items={groups} hierarchy={hierarchy} showParentLabel />
+    );
+    await open('countries');
+    await fireEvent.press(screen.getByText('Apple'));
+    await fireEvent.press(screen.getByText('Water'));
+    await fireEvent.press(screen.getByTestId('countries-done'));
+    expect(screen.getByText('Fruits › Apple, Water')).toBeTruthy();
+  });
+
+  it('applies to chips, including the remove button label', async () => {
+    await render(
+      <Multi
+        items={groups}
+        hierarchy={hierarchy}
+        showParentLabel
+        multipleDisplay="chips"
+        initial={[12, 20]}
+      />
+    );
+    expect(screen.getByText('Fruits › Banana')).toBeTruthy();
+    expect(screen.getByText('Water')).toBeTruthy();
+    expect(screen.getByLabelText('Remove Fruits › Banana')).toBeTruthy();
+  });
+
+  it('keeps the group name after the options list changes', async () => {
+    const { rerender } = await render(
+      <Single items={groups} hierarchy={hierarchy} showParentLabel />
+    );
+    await open('country');
+    await fireEvent.press(screen.getByText('Banana'));
+    await rerender(<Single items={[]} hierarchy={hierarchy} showParentLabel />);
+    expect(screen.getByText('Fruits › Banana')).toBeTruthy();
+  });
+});
+
 describe('multi select', () => {
   it('drafts picks and applies them with Done', async () => {
     const spy = jest.fn();

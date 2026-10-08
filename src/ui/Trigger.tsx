@@ -21,6 +21,8 @@ interface Props<T> {
   hasError: boolean;
   loading: boolean;
   chips: boolean;
+  /** Label for a selected row (e.g. with its group prefix). */
+  rowLabel: (row: RowData<T>) => string;
   base: BaseStyles;
   styles: Partial<PickerStyles>;
   strings: PickerStrings;
@@ -38,6 +40,7 @@ export function Trigger<T>({
   hasError,
   loading,
   chips,
+  rowLabel,
   base,
   styles,
   strings,
@@ -78,6 +81,7 @@ export function Trigger<T>({
               <Chip
                 key={row.valueKey}
                 row={row}
+                label={rowLabel(row)}
                 onRemove={disabled ? undefined : picker.removeValue}
                 base={base}
                 styles={styles}
@@ -122,6 +126,7 @@ export function Trigger<T>({
 
 function Chip<T>({
   row,
+  label,
   onRemove,
   base,
   styles,
@@ -129,6 +134,7 @@ function Chip<T>({
   tokens,
 }: {
   row: RowData<T>;
+  label: string;
   onRemove?: (value: RowData<T>['value']) => void;
   base: BaseStyles;
   styles: Partial<PickerStyles>;
@@ -138,7 +144,7 @@ function Chip<T>({
   return (
     <View style={[base.chip, styles.chip]}>
       <Text style={[base.chipText, styles.chipText]} numberOfLines={1}>
-        {row.label}
+        {label}
       </Text>
       {onRemove ? (
         <Pressable
@@ -146,7 +152,7 @@ function Chip<T>({
           hitSlop={8}
           style={base.chipRemove}
           accessibilityRole="button"
-          accessibilityLabel={strings.remove(row.label)}
+          accessibilityLabel={strings.remove(label)}
         >
           <CloseIcon color={tokens.colors.textMuted} size={10} />
         </Pressable>

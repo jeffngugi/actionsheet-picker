@@ -5,6 +5,7 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
+  Switch,
   Text,
   useColorScheme,
   View,
@@ -97,26 +98,48 @@ function SchemaDemo() {
 }
 
 function GroupedDemo() {
+  const dark = useColorScheme() === 'dark';
   const [single, setSingle] = useState<number | null>(null);
   const [several, setSeveral] = useState<number[]>([]);
+  // Search is opt-in for grouped options, same as for flat lists.
+  const [searchable, setSearchable] = useState(true);
+  // Default label is just the option ("Banana"); opt in to "Fruits › Banana".
+  const [showParent, setShowParent] = useState(false);
   return (
     <Section title="Grouped options (multi-level)">
+      <View style={styles.switchRow}>
+        <Text style={[styles.switchLabel, dark && styles.h1Dark]}>
+          Searchable
+        </Text>
+        <Switch
+          value={searchable}
+          onValueChange={setSearchable}
+          testID="grouped-searchable"
+          accessibilityLabel="Searchable"
+        />
+      </View>
+      <View style={styles.switchRow}>
+        <Text style={[styles.switchLabel, dark && styles.h1Dark]}>
+          Show group in label
+        </Text>
+        <Switch
+          value={showParent}
+          onValueChange={setShowParent}
+          testID="grouped-show-parent"
+          accessibilityLabel="Show group in label"
+        />
+      </View>
       <ActionSheetPicker
         label="Single option"
         placeholder="Select an option"
         title="Select an option"
         items={optionGroups}
         hierarchy={{ type: 'nested', childrenKey: 'options' }}
-        searchable
+        searchable={searchable}
+        showParentLabel={showParent}
         stickyHeaders
         value={single}
         onChange={setSingle}
-        formatSelected={([row]) => {
-          const group = optionGroups.find(
-            (g) => String(g.value) === row?.parentKey
-          );
-          return group ? `${group.label} › ${row?.label}` : (row?.label ?? '');
-        }}
         testID="grouped"
       />
       <ActionSheetPicker
@@ -126,7 +149,8 @@ function GroupedDemo() {
         multiple
         items={optionGroups}
         hierarchy={{ type: 'nested', childrenKey: 'options' }}
-        searchable
+        searchable={searchable}
+        showParentLabel={showParent}
         value={several}
         onChange={setSeveral}
         testID="grouped-multi"
@@ -429,6 +453,13 @@ const styles = StyleSheet.create({
   },
   value: { fontSize: 12, color: '#6C6C70', fontFamily: 'monospace' },
   hint: { fontSize: 12, color: '#D93025', marginBottom: 8 },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  switchLabel: { fontSize: 14, color: '#1C1C1E' },
   button: {
     backgroundColor: '#E5E5EA',
     padding: 12,

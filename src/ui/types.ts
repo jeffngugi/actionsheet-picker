@@ -131,6 +131,13 @@ export interface PickerUIProps<T> {
   multipleDisplay?: 'labels' | 'count' | 'chips';
   /** Custom trigger text from the selected rows. */
   formatSelected?: (rows: Row<T>[]) => string;
+  /**
+   * Grouped options: prefix a selected child with its group, e.g.
+   * "Fruits › Banana". Default `false` (just "Banana").
+   */
+  showParentLabel?: boolean;
+  /** Separator used by `showParentLabel`. Default `" › "`. */
+  parentLabelSeparator?: string;
 
   colorScheme?: 'auto' | 'light' | 'dark';
   tokens?: DeepPartial<PickerTokens>;

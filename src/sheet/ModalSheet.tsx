@@ -24,6 +24,8 @@ import {
   shouldDismiss,
 } from './swipe';
 
+const IOS_STATUS_BAR_FALLBACK = 44;
+
 function useReduceMotion(): boolean {
   const [reduce, setReduce] = useState(false);
   useEffect(() => {
@@ -93,6 +95,25 @@ export function ModalSheet({
       show.remove();
       hide.remove();
       setKeyboardOverlap(0);
+    };
+  }, [visible]);
+
+  // iOS: KeyboardAvoidingView lifts the content; we only need to know the
+  // keyboard is up to drop the home-indicator padding and let the sheet
+  // grow. `will` events keep the layout change in step with the keyboard.
+  const [iosKeyboardUp, setIosKeyboardUp] = useState(false);
+  useEffect(() => {
+    if (Platform.OS !== 'ios' || !visible) return undefined;
+    const show = Keyboard.addListener('keyboardWillShow', () =>
+      setIosKeyboardUp(true)
+    );
+    const hide = Keyboard.addListener('keyboardWillHide', () =>
+      setIosKeyboardUp(false)
+    );
+    return () => {
+      show.remove();
+      hide.remove();
+      setIosKeyboardUp(false);
     };
   }, [visible]);
 
@@ -200,25 +221,31 @@ export function ModalSheet({
   // The modal draws under the status bar; fullscreen sheets clear it.
   const statusBar = Platform.OS === 'android' ? StatusBar.currentHeight : 0;
   const paddingTop = fullscreen ? (topInset ?? statusBar ?? 0) : 0;
-  // The keyboard covers the bottom inset area, so take whichever is larger.
+  // The keyboard covers the bottom inset area: on Android take whichever is
+  // larger; on iOS (KeyboardAvoidingView already lifts us) drop the inset.
   const sheetLayout = {
-    paddingBottom: Math.max(bottomInset, keyboardOverlap),
+    paddingBottom: iosKeyboardUp ? 0 : Math.max(bottomInset, keyboardOverlap),
     paddingTop,
   };
-  // While the Android keyboard is up, the 80% cap would leave the list a
-  // row or two between the header and the keyboard. Let the sheet use the
-  // full height below the status bar instead; it drops back on hide.
-  const keyboardLayout =
-    keyboardOverlap > 0 && !fullscreen
-      ? {
-          maxHeight: undefined,
-          ...(fixedHeight
-            ? { height: Dimensions.get('screen').height - (statusBar ?? 0) }
-            : {
-                maxHeight: Dimensions.get('screen').height - (statusBar ?? 0),
-              }),
-        }
-      : null;
+  // While the keyboard is up, the 80% cap would leave the list a row or two
+  // between the header and the keyboard. Let the sheet use the full height
+  // below the status bar instead; it drops back when the keyboard hides.
+  let keyboardLayout = null;
+  if (!fullscreen && keyboardOverlap > 0) {
+    const available = Dimensions.get('screen').height - (statusBar ?? 0);
+    keyboardLayout = fixedHeight
+      ? { maxHeight: undefined, height: available }
+      : { maxHeight: available };
+  } else if (!fullscreen && iosKeyboardUp) {
+    // Fill the area KeyboardAvoidingView leaves, below the safe-area top
+    // (44 pt fallback when safe-area insets aren't available).
+    keyboardLayout = {
+      maxHeight: undefined,
+      marginTop: topInset ?? IOS_STATUS_BAR_FALLBACK,
+      flexShrink: 1,
+      ...(fixedHeight ? { height: undefined, flexGrow: 1 } : null),
+    };
+  }
 
   return (
     <Modal
