@@ -56,7 +56,11 @@ export function Trigger<T>({
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityHint={placeholder}
-      accessibilityValue={text ? { text } : undefined}
+      // Always a non-empty object: on Android, switching this prop to
+      // `undefined` keeps the old value (a cleared field would still be
+      // announced with its old selection), and an empty string is read as
+      // a dangling "Label,". The placeholder describes the empty state.
+      accessibilityValue={{ text: text || placeholder }}
       accessibilityState={{ disabled, expanded: picker.isOpen }}
       style={[
         base.trigger,

@@ -24,6 +24,26 @@ export default defineConfig([
     },
   },
   {
+    // Optional peers may only be imported by their adapter entry points, so
+    // the main entry never requires them.
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/adapters/**', 'src/__tests__/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'react-hook-form',
+              message:
+                'Optional peer: import it only from src/adapters/react-hook-form.tsx.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     ignores: ['node_modules/', 'lib/', 'coverage/'],
   },
 ]);

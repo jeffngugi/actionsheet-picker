@@ -1,0 +1,6 @@
+{
+  "//": "Subpath stub for bundlers that ignore package.json `exports` (e.g. Metro before RN 0.79).",
+  "private": true,
+  "main": "../lib/module/adapters/react-hook-form.js",
+  "types": "../lib/typescript/src/adapters/react-hook-form.d.ts"
+}

@@ -9,7 +9,9 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
+import { useForm } from 'react-hook-form';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { RHFActionSheetPicker } from 'actionsheet-picker/react-hook-form';
 import {
   ActionSheetPicker,
   PickerProvider,
@@ -290,6 +292,59 @@ function ThemedDemo() {
   );
 }
 
+type FormValues = { country: string | null; groups: number[] };
+
+function FormDemo() {
+  const [submitted, setSubmitted] = useState<FormValues | null>(null);
+  const { control, handleSubmit, reset } = useForm<FormValues>({
+    defaultValues: { country: null, groups: [] },
+  });
+  return (
+    <Section title="react-hook-form adapter">
+      <RHFActionSheetPicker
+        control={control}
+        name="country"
+        rules={{ required: 'Please select a country' }}
+        label="Country"
+        items={countries}
+        searchable
+        testID="form-country"
+      />
+      <RHFActionSheetPicker
+        control={control}
+        name="groups"
+        rules={{
+          validate: (v) => v.length > 0 || 'Select at least one option',
+        }}
+        label="Options"
+        placeholder="Select options"
+        multiple
+        items={optionGroups}
+        hierarchy={{ type: 'nested', childrenKey: 'options' }}
+        testID="form-groups"
+      />
+      <Pressable
+        style={styles.button}
+        onPress={() => handleSubmit(setSubmitted)()}
+        testID="form-submit"
+      >
+        <Text style={styles.buttonText}>Submit</Text>
+      </Pressable>
+      <Pressable
+        style={styles.button}
+        onPress={() => {
+          reset();
+          setSubmitted(null);
+        }}
+        testID="form-reset"
+      >
+        <Text style={styles.buttonText}>Reset</Text>
+      </Pressable>
+      <Value value={{ submitted }} />
+    </Section>
+  );
+}
+
 function InsideModalDemo() {
   const dark = useColorScheme() === 'dark';
   const [open, setOpen] = useState(false);
@@ -342,6 +397,7 @@ function Demos() {
       <RemoteInfiniteDemo />
       <StatesDemo />
       <ThemedDemo />
+      <FormDemo />
       <InsideModalDemo />
     </ScrollView>
   );

@@ -4031,6 +4031,7 @@ __metadata:
     expo-status-bar: "npm:~57.0.1"
     react: "npm:19.2.3"
     react-dom: "npm:19.2.3"
+    react-hook-form: "npm:^7.89.0"
     react-native: "npm:0.86.3"
     react-native-builder-bob: "npm:^0.43.0"
     react-native-monorepo-config: "npm:^0.4.0"
@@ -4064,6 +4065,7 @@ __metadata:
     lefthook: "npm:^2.1.10"
     prettier: "npm:^3.9.6"
     react: "npm:19.2.3"
+    react-hook-form: "npm:^7.89.0"
     react-native: "npm:0.86.3"
     react-native-builder-bob: "npm:^0.43.0"
     release-it: "npm:^21.0.1"
@@ -4072,9 +4074,12 @@ __metadata:
     typescript: "npm:^6.0.3"
   peerDependencies:
     react: ">=18"
+    react-hook-form: ">=7.40"
     react-native: ">=0.72"
     react-native-safe-area-context: ">=4"
   peerDependenciesMeta:
+    react-hook-form:
+      optional: true
     react-native-safe-area-context:
       optional: true
   languageName: unknown
@@ -10569,6 +10574,19 @@ __metadata:
   peerDependencies:
     react: ^19.2.3
   checksum: 10c0/dc43f7ede06f46f3acc16ee83107c925530de9b91d1d0b3824583814746ff4c498ea64fd65cd83aba363205268adff52e2827c582634ae7b15069deaeabc4892
+  languageName: node
+  linkType: hard
+
+"react-hook-form@npm:^7.89.0":
+  version: 7.89.0
+  resolution: "react-hook-form@npm:7.89.0"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8.0 || ^17 || ^18 || ^19
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/efeefbacb6ded5e1c0eb0b740cab9e839b9b8018f692fe538f68295a0a655b42d1530a6aa00a47e34a272e429bd752f3ea8c8799b182ed8cf299a9966e90332a
   languageName: node
   linkType: hard
 

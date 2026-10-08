@@ -2,7 +2,11 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "actionsheet-picker": ["./src/index"]
+      "actionsheet-picker": ["./src/index"],
+      "actionsheet-picker/react-hook-form": ["./src/adapters/react-hook-form"],
+      // The example has its own copy (Metro resolves peers from the app);
+      // point type-checking at one copy so `Control` types line up.
+      "react-hook-form": ["./node_modules/react-hook-form"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
