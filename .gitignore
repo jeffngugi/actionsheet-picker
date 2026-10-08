@@ -87,3 +87,7 @@ nitrogen/
 
 # Jest coverage
 coverage/
+
+# VitePress
+docs/.vitepress/dist/
+docs/.vitepress/cache/

@@ -2,6 +2,8 @@
 
 A searchable, grouped, infinite-scrolling picker for React Native that opens as a bottom sheet.
 
+**Documentation, screenshots and examples: [jeffngugi.github.io/actionsheet-picker](https://jeffngugi.github.io/actionsheet-picker/)**
+
 - **Zero native dependencies.** Only `react` and `react-native` are required. The sheet is built on `Modal`, `Animated` and `FlatList`.
 - **Works with any form library.** The picker is a controlled input (`value` / `onChange` / `onBlur` / `error`). An optional react-hook-form adapter is included.
 - **Single select by default**, with opt-in multi-select (`min`, `max`, a draft that applies on **Done**, and labels, count or chips display).

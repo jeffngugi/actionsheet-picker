@@ -34,7 +34,10 @@
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "test": "jest",
     "release": "release-it --only-version",
-    "compat": "bash scripts/compat-check.sh"
+    "compat": "bash scripts/compat-check.sh",
+    "docs:dev": "yarn workspace actionsheet-picker-docs dev",
+    "docs:build": "yarn workspace actionsheet-picker-docs build",
+    "docs:preview": "yarn workspace actionsheet-picker-docs preview"
   },
   "keywords": [
     "react-native",
@@ -101,7 +104,8 @@
     "react-native-safe-area-context": ">=4"
   },
   "workspaces": [
-    "example"
+    "example",
+    "docs"
   ],
   "packageManager": "yarn@4.11.0",
   "react-native-builder-bob": {
