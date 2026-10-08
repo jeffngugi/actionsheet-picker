@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ElementRef } from 'react';
 import {
   AccessibilityInfo,
   Animated,
@@ -75,28 +75,45 @@ export function ModalSheet({
   const durationIn = reduceMotion ? 0 : tokens.motion.durationIn;
   const durationOut = reduceMotion ? 0 : tokens.motion.durationOut;
 
-  // Android: lift content above the keyboard. Measured from the keyboard's
-  // top edge so it works whether or not the window resizes (edge-to-edge
-  // apps on Android 15+ don't resize). `screenY` is in screen coordinates
-  // and the modal spans the whole screen, so compare with the screen
-  // height, not the window's (which may exclude the system bars).
+  // Android: lift content above the keyboard. Whether the modal window
+  // resizes for the keyboard depends on the OS version and the app's
+  // edge-to-edge setup, so instead of assuming either, compare the
+  // keyboard's top edge with where the modal root actually ends on screen:
+  // a resized window ends at the keyboard (no overlap), a full-screen one
+  // ends under it. Both are screen coordinates (the modal is translucent,
+  // so its window starts at the top of the screen).
   // iOS uses KeyboardAvoidingView.
-  const [keyboardOverlap, setKeyboardOverlap] = useState(0);
+  const rootRef = useRef<ElementRef<typeof View>>(null);
+  const [root, setRoot] = useState<{ y: number; height: number } | null>(null);
+  const [keyboardTop, setKeyboardTop] = useState<number | null>(null);
   useEffect(() => {
     if (Platform.OS !== 'android' || !visible) return undefined;
-    const show = Keyboard.addListener('keyboardDidShow', (e) => {
-      const screenHeight = Dimensions.get('screen').height;
-      setKeyboardOverlap(Math.max(0, screenHeight - e.endCoordinates.screenY));
-    });
+    const show = Keyboard.addListener('keyboardDidShow', (e) =>
+      setKeyboardTop(e.endCoordinates.screenY)
+    );
     const hide = Keyboard.addListener('keyboardDidHide', () =>
-      setKeyboardOverlap(0)
+      setKeyboardTop(null)
     );
     return () => {
       show.remove();
       hide.remove();
-      setKeyboardOverlap(0);
+      setKeyboardTop(null);
     };
   }, [visible]);
+  const measureRoot = () => {
+    if (Platform.OS !== 'android') return;
+    rootRef.current?.measureInWindow(
+      (_x: number, y: number, _w: number, h: number) => {
+        if (h > 0) setRoot({ y, height: h });
+      }
+    );
+  };
+  const keyboardUp = keyboardTop !== null;
+  const rootHeight = root?.height ?? Dimensions.get('screen').height;
+  const rootBottom = (root?.y ?? 0) + rootHeight;
+  const keyboardOverlap = keyboardUp
+    ? Math.max(0, rootBottom - keyboardTop)
+    : 0;
 
   // iOS: KeyboardAvoidingView lifts the content; we only need to know the
   // keyboard is up to drop the home-indicator padding and let the sheet
@@ -230,9 +247,11 @@ export function ModalSheet({
   // While the keyboard is up, the 80% cap would leave the list a row or two
   // between the header and the keyboard. Let the sheet use the full height
   // below the status bar instead; it drops back when the keyboard hides.
+  // The root's height is used, not the screen's, because a resized window
+  // already ends at the keyboard.
   let keyboardLayout = null;
-  if (!fullscreen && keyboardOverlap > 0) {
-    const available = Dimensions.get('screen').height - (statusBar ?? 0);
+  if (!fullscreen && keyboardUp) {
+    const available = rootHeight - (statusBar ?? 0);
     keyboardLayout = fixedHeight
       ? { maxHeight: undefined, height: available }
       : { maxHeight: available };
@@ -256,51 +275,53 @@ export function ModalSheet({
       onRequestClose={onRequestClose}
       {...modalProps}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={base.modalRoot}
-      >
-        <Animated.View
-          style={[base.backdrop, overrides.backdrop, { opacity: progress }]}
+      <View ref={rootRef} style={base.modalRoot} onLayout={measureRoot}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={base.modalRoot}
         >
-          <Pressable
-            style={base.modalRoot}
-            onPress={closeOnBackdropPress ? onRequestClose : undefined}
-            accessible={false}
-            importantForAccessibility="no"
-            testID={testID ? `${testID}-backdrop` : undefined}
-          />
-        </Animated.View>
-        <Animated.View
-          testID={testID ? `${testID}-sheet` : undefined}
-          accessibilityViewIsModal
-          onLayout={(e) => {
-            sheetHeightRef.current = e.nativeEvent.layout.height;
-          }}
-          style={[
-            base.sheet,
-            fixedHeight && base.sheetFixed,
-            fullscreen && base.sheetFullscreen,
-            sheetLayout,
-            keyboardLayout,
-            { transform: [{ translateY }] },
-            overrides.sheet,
-          ]}
-        >
-          {!fullscreen ? (
-            <View
-              style={base.handleArea}
-              testID={testID ? `${testID}-handle` : undefined}
-              {...dragHandlers}
-            >
-              <View style={[base.handle, overrides.handle]} />
-            </View>
-          ) : null}
-          <SheetDragContext.Provider value={dragHandlers}>
-            {children}
-          </SheetDragContext.Provider>
-        </Animated.View>
-      </KeyboardAvoidingView>
+          <Animated.View
+            style={[base.backdrop, overrides.backdrop, { opacity: progress }]}
+          >
+            <Pressable
+              style={base.modalRoot}
+              onPress={closeOnBackdropPress ? onRequestClose : undefined}
+              accessible={false}
+              importantForAccessibility="no"
+              testID={testID ? `${testID}-backdrop` : undefined}
+            />
+          </Animated.View>
+          <Animated.View
+            testID={testID ? `${testID}-sheet` : undefined}
+            accessibilityViewIsModal
+            onLayout={(e) => {
+              sheetHeightRef.current = e.nativeEvent.layout.height;
+            }}
+            style={[
+              base.sheet,
+              fixedHeight && base.sheetFixed,
+              fullscreen && base.sheetFullscreen,
+              sheetLayout,
+              keyboardLayout,
+              { transform: [{ translateY }] },
+              overrides.sheet,
+            ]}
+          >
+            {!fullscreen ? (
+              <View
+                style={base.handleArea}
+                testID={testID ? `${testID}-handle` : undefined}
+                {...dragHandlers}
+              >
+                <View style={[base.handle, overrides.handle]} />
+              </View>
+            ) : null}
+            <SheetDragContext.Provider value={dragHandlers}>
+              {children}
+            </SheetDragContext.Provider>
+          </Animated.View>
+        </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 }
