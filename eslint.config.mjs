@@ -44,6 +44,6 @@ export default defineConfig([
     },
   },
   {
-    ignores: ['node_modules/', 'lib/', 'coverage/'],
+    ignores: ['node_modules/', 'lib/', 'coverage/', 'scripts/compat/'],
   },
 ]);

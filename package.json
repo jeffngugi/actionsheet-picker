@@ -1,6 +1,6 @@
 {
   "name": "actionsheet-picker",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Searchable, hierarchical, infinite-scrolling single/multi action-sheet picker for React Native. Zero native dependencies.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
@@ -33,7 +33,8 @@
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "test": "jest",
-    "release": "release-it --only-version"
+    "release": "release-it --only-version",
+    "compat": "bash scripts/compat-check.sh"
   },
   "keywords": [
     "react-native",
@@ -159,7 +160,9 @@
       "@release-it/conventional-changelog": {
         "preset": {
           "name": "angular"
-        }
+        },
+        "infile": "CHANGELOG.md",
+        "header": "# Changelog"
       }
     }
   },
